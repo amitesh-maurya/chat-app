@@ -6,7 +6,7 @@ A WhatsApp-like real-time chat application built with a modern monorepo architec
 
 
 
-## 🏗️ Architecture## Using this example
+##  Architecture## Using this example
 
 
 
