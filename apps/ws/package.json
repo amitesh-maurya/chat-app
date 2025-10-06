@@ -1,0 +1,24 @@
+{
+  "name": "@chat-app/ws",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "ws": "^8.14.2",
+    "jsonwebtoken": "^9.0.2",
+    "redis": "^4.6.10",
+    "@chat-app/db": "*"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.5.6",
+    "@types/jsonwebtoken": "^9.0.3",
+    "@types/node": "^20.8.0",
+    "tsx": "^4.6.0",
+    "typescript": "^5.9.2"
+  }
+}
