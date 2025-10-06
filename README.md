@@ -1,52 +1,389 @@
-# Real-Time Chat Application# Turborepo starter
+# Chat Application
 
+A real-time chat application built with modern web technologies, featuring user authentication, friend management, and live messaging capabilities.
 
+## 🚀 Overview
 
-A WhatsApp-like real-time chat application built with a modern monorepo architecture using Turborepo.This Turborepo starter is maintained by the Turborepo core team.
+This is a full-stack chat application that enables users to:
+- Register and authenticate securely
+- Add and manage friends
+- Send real-time messages
+- Share images and voice recordings
+- Receive live notifications
 
+## 🏗️ Tech Stack
 
+- **Frontend**: Next.js 15.5.4, React, TypeScript, Tailwind CSS
+- **Backend**: Express.js, TypeScript, JWT Authentication
+- **WebSocket**: ws library for real-time communication
+- **Database**: SQLite with Prisma ORM
+- **Monorepo**: Turbo for workspace management
 
-##  Architecture## Using this example
+## 📁 Folder Structure
 
+```
+chat-app/
+├── apps/
+│   ├── backend/          # Express.js API server
+│   │   ├── src/
+│   │   │   ├── index.ts        # Main server file
+│   │   │   ├── middleware/     # Auth middleware
+│   │   │   └── routes/         # API routes (auth, friends, messages)
+│   │   └── uploads/      # File uploads storage
+│   ├── frontend/         # Next.js React application
+│   │   ├── app/                # App router pages
+│   │   ├── components/         # Reusable UI components
+│   │   ├── lib/               # Utilities and stores
+│   │   │   ├── stores/        # Zustand state management
+│   │   │   └── hooks/         # Custom React hooks
+│   │   └── public/            # Static assets
+│   └── ws/              # WebSocket server
+│       └── src/
+│           └── index.ts       # WebSocket server implementation
+├── packages/
+│   ├── db/              # Database package
+│   │   ├── prisma/
+│   │   │   ├── schema.prisma  # Database schema
+│   │   │   └── dev.db         # SQLite database file
+│   │   └── src/
+│   ├── ui/              # Shared UI components
+│   ├── eslint-config/   # Shared ESLint configuration
+│   └── typescript-config/ # Shared TypeScript configuration
+├── .env                 # Environment variables
+├── .env.example         # Environment variables template
+├── turbo.json          # Turbo workspace configuration
+└── package.json        # Root package configuration
+```
 
+## 🛠️ Prerequisites
 
-This project follows a monorepo structure with the following apps and packages:Run the following command:
+- **Node.js** 18+ 
+- **npm** 8+
+- **Git**
 
+## ⚡ Quick Start
 
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/amitesh-maurya/chat-app.git
+   cd chat-app
+   ```
 
-### Apps```sh
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-- **`apps/frontend`** - Next.js frontend with real-time chat interfacenpx create-turbo@latest
+3. **Set up environment variables**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
 
-- **`apps/backend`** - Express.js HTTP API server for authentication and data```
+4. **Set up the database**
+   ```bash
+   npx prisma generate --schema=packages/db/prisma/schema.prisma
+   npx prisma db push --schema=packages/db/prisma/schema.prisma
+   ```
 
-- **`apps/ws`** - WebSocket server for real-time messaging and notifications
+5. **Start all services**
+   ```bash
+   npm run dev
+   ```
 
-## What's inside?
+6. **Access the application**
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:3001
+   - WebSocket: ws://localhost:3002
 
-### Packages
+## 🔧 Running Individual Services
 
-- **`packages/db`** - Shared Prisma client and database schemaThis Turborepo includes the following packages/apps:
+### Backend API Server
 
-- **`packages/ui`** - Shared React UI components
+```bash
+cd apps/backend
+npm run dev
+```
 
-- **`packages/eslint-config`** - Shared ESLint configurations### Apps and Packages
+The backend server will start on http://localhost:3001
 
-- **`packages/typescript-config`** - Shared TypeScript configurations
+**Available endpoints:**
+- `POST /auth/signup` - User registration
+- `POST /auth/login` - User authentication
+- `GET /friends` - Get friends list
+- `POST /friends/request` - Send friend request
+- `GET /messages/:friendshipId` - Get chat messages
+- `POST /messages` - Send message
 
-- `docs`: a [Next.js](https://nextjs.org/) app
+### Frontend Application
 
-## ✨ Features- `web`: another [Next.js](https://nextjs.org/) app
+```bash
+cd apps/frontend
+npm run dev
+```
 
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
+The frontend will start on http://localhost:3000
 
-### Core Features- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
+**Features:**
+- User authentication (login/signup)
+- Real-time chat interface
+- Friend management
+- Image and voice message support
+- Responsive design
 
-- ✅ User authentication (signup/login) with JWT- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+### WebSocket Server
 
-- ✅ Friend request system (send, receive, accept, reject)
+```bash
+cd apps/ws
+npm run dev
+```
 
-- ✅ Real-time messaging using WebSocket and Redis Pub/SubEach package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+The WebSocket server will start on port 3002
+
+**Capabilities:**
+- Real-time message broadcasting
+- User presence tracking
+- Typing indicators
+- Connection management with JWT authentication
+
+## 📊 Database Schema
+
+The application uses Prisma ORM with SQLite. The complete schema is located at:
+
+**`packages/db/prisma/schema.prisma`**
+
+### Main Models:
+
+- **User**: User accounts and profiles
+  ```prisma
+  model User {
+    id        String   @id @default(cuid())
+    email     String   @unique
+    username  String   @unique
+    password  String
+    avatar    String?
+    status    String?
+    isOnline  Boolean  @default(false)
+    lastSeen  DateTime @default(now())
+    // ... relationships
+  }
+  ```
+
+- **Friendship**: Friend relationships between users
+  ```prisma
+  model Friendship {
+    id        String   @id @default(cuid())
+    user1Id   String
+    user2Id   String
+    createdAt DateTime @default(now())
+    // ... relationships and constraints
+  }
+  ```
+
+- **FriendRequest**: Pending friend requests
+  ```prisma
+  model FriendRequest {
+    id         String              @id @default(cuid())
+    senderId   String
+    receiverId String
+    status     FriendRequestStatus @default(PENDING)
+    createdAt  DateTime            @default(now())
+    // ... relationships
+  }
+  ```
+
+- **Message**: Chat messages with support for text, images, and audio
+  ```prisma
+  model Message {
+    id           String      @id @default(cuid())
+    content      String?
+    type         MessageType @default(TEXT)
+    friendshipId String
+    senderId     String
+    createdAt    DateTime    @default(now())
+    // ... relationships
+  }
+  ```
+
+- **MessageReaction**: Message reactions/emojis
+  ```prisma
+  model MessageReaction {
+    id        String   @id @default(cuid())
+    messageId String
+    userId    String
+    emoji     String
+    createdAt DateTime @default(now())
+    // ... relationships
+  }
+  ```
+
+### Key Relationships:
+
+- Users can have multiple friendships
+- Friendships contain multiple messages
+- Messages can have reactions
+- Friend requests track pending connections
+
+### Database Commands:
+
+```bash
+# Generate Prisma client
+npx prisma generate --schema=packages/db/prisma/schema.prisma
+
+# Apply schema changes to database
+npx prisma db push --schema=packages/db/prisma/schema.prisma
+
+# Open Prisma Studio (database browser)
+npx prisma studio --schema=packages/db/prisma/schema.prisma
+
+# Reset database (caution: deletes all data)
+npx prisma migrate reset --schema=packages/db/prisma/schema.prisma
+```
+
+## 🔒 Environment Variables
+
+Copy `.env.example` to `.env` and configure:
+
+```env
+# Database
+DATABASE_URL="file:d:/path/to/your/project/packages/db/prisma/dev.db"
+
+# JWT Secret for authentication
+JWT_SECRET="your-secure-jwt-secret-key"
+
+# Redis (optional - for production scaling)
+REDIS_URL="redis://localhost:6379"
+
+# Server Ports
+PORT=3001              # Backend API port
+WS_PORT=3002          # WebSocket server port
+FRONTEND_URL="http://localhost:3000"
+```
+
+## 🧪 Development Commands
+
+```bash
+# Install all dependencies
+npm install
+
+# Start all services in development mode
+npm run dev
+
+# Build all packages
+npm run build
+
+# Type checking
+npm run type-check
+
+# Lint code
+npm run lint
+
+# Database operations
+npx prisma generate --schema=packages/db/prisma/schema.prisma
+npx prisma db push --schema=packages/db/prisma/schema.prisma
+npx prisma studio --schema=packages/db/prisma/schema.prisma
+```
+
+## 📝 API Documentation
+
+### Authentication
+
+All protected routes require a JWT token in the Authorization header:
+```
+Authorization: Bearer <your-jwt-token>
+```
+
+### Message Types
+
+The application supports multiple message types:
+- `text`: Plain text messages
+- `image`: Image files (PNG, JPG, GIF)
+- `audio`: Voice recordings (WebM, MP3)
+
+### WebSocket Events
+
+- `message`: New message received
+- `typing`: User typing indicator
+- `user_status`: User online/offline status
+- `friend_request`: New friend request received
+
+## 🚀 Production Deployment
+
+1. **Build the application**
+   ```bash
+   npm run build
+   ```
+
+2. **Set production environment variables**
+   ```bash
+   NODE_ENV=production
+   DATABASE_URL="your-production-database-url"
+   JWT_SECRET="your-production-jwt-secret"
+   REDIS_URL="your-production-redis-url"
+   ```
+
+3. **Start production servers**
+   ```bash
+   # Backend
+   cd apps/backend && npm start
+   
+   # WebSocket
+   cd apps/ws && npm start
+   
+   # Frontend (if self-hosting)
+   cd apps/frontend && npm start
+   ```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Troubleshooting
+
+### Common Issues:
+
+1. **Port already in use**
+   ```bash
+   # Kill processes on ports 3000, 3001, 3002
+   npx kill-port 3000 3001 3002
+   ```
+
+2. **Database connection issues**
+   ```bash
+   # Regenerate Prisma client
+   npx prisma generate --schema=packages/db/prisma/schema.prisma
+   ```
+
+3. **WebSocket connection failed**
+   - Check if WebSocket server is running on port 3002
+   - Verify JWT token is valid
+   - Check browser console for detailed error messages
+
+4. **Build failures**
+   ```bash
+   # Clean install
+   rm -rf node_modules package-lock.json
+   npm install
+   ```
+
+## 📞 Support
+
+If you encounter any issues or have questions:
+- Create an issue on GitHub
+- Check the troubleshooting section above
+- Review the logs in your terminal for error details
+
+---
+
+**Happy coding! 🎉**
 
 - ✅ Friend list management
 
