@@ -1,8 +1,13 @@
+import dotenv from 'dotenv';
+import path from 'path';
+
+// Load environment variables from root .env file
+dotenv.config({ path: path.join(__dirname, '../../../.env') });
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import path from 'path';
 import { PrismaClient } from '@chat-app/db';
 import { createClient } from 'redis';
 

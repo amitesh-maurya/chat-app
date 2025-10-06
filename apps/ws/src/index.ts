@@ -1,3 +1,9 @@
+import dotenv from 'dotenv';
+import path from 'path';
+
+// Load environment variables from root .env file
+dotenv.config({ path: path.join(__dirname, '../../../.env') });
+
 import { WebSocketServer, WebSocket } from 'ws';
 import { createClient } from 'redis';
 import jwt from 'jsonwebtoken';
@@ -54,8 +60,11 @@ wss.on('connection', async (ws: WebSocket, req) => {
       if (message.type === 'AUTH') {
         // Authenticate user
         const token = message.token;
+        console.log('Received AUTH message. Token exists:', !!token);
+        console.log('Token preview (first 20 chars):', token ? token.substring(0, 20) + '...' : 'NO_TOKEN');
         
         if (!token) {
+          console.log('No token provided, closing connection');
           ws.send(JSON.stringify({
             type: 'ERROR',
             message: 'Authentication token required'
@@ -64,7 +73,9 @@ wss.on('connection', async (ws: WebSocket, req) => {
         }
 
         try {
+          console.log('Attempting to verify JWT token');
           const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as any;
+          console.log('JWT verified successfully for user:', decoded.userId);
           
           const user = await prisma.user.findUnique({
             where: { id: decoded.userId },
@@ -72,6 +83,7 @@ wss.on('connection', async (ws: WebSocket, req) => {
           });
 
           if (!user) {
+            console.log('User not found in database');
             ws.send(JSON.stringify({
               type: 'ERROR',
               message: 'Invalid token'
@@ -93,9 +105,10 @@ wss.on('connection', async (ws: WebSocket, req) => {
             message: 'Authentication successful'
           }));
 
-          console.log(`User ${user.username} connected`);
+          console.log(`User ${user.username} connected successfully`);
 
         } catch (error) {
+          console.log('JWT verification failed:', error);
           ws.send(JSON.stringify({
             type: 'ERROR',
             message: 'Invalid token'

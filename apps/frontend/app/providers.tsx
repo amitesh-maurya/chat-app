@@ -1,12 +1,8 @@
 'use client';
 
 import { Toaster } from 'react-hot-toast';
-import { useWebSocket } from '../lib/hooks/useWebSocket';
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  // Initialize WebSocket connection
-  useWebSocket();
-
   return (
     <>
       {children}
